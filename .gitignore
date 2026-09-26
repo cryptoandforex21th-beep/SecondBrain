@@ -1,0 +1,63 @@
+# Environments & Secrets
+.env
+*.env.*
+*.secret
+*.key
+*.pem
+*.token
+credentials.json
+secrets.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+
+# Personal Notes, Vaults & Local Data
+00_system/
+01_knowledge/
+*.rvt
+*.rfa
+*.rte
+*.dwg
+*.dxf
+*.dyn
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.log
