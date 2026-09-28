@@ -1,4 +1,4 @@
-# ⚡ Antigravity Computer Use 2.1 (Hyper-Speed Engine)
+# ⚡ Antigravity Computer Use Faster(Hyper-Speed Engine)
 
 > Zero-latency, atomic Windows desktop automation skill designed for **Google Antigravity** and autonomous AI coding agents.
 
