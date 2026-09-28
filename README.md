@@ -58,6 +58,13 @@ flowchart TD
 - **Dynamic Policy Enforcement**: Ensures autonomous desktop workflows execute only within predefined safety constraints.
 
 ### 2. 🏛️ AEC & BIM Autonomous Workflow Orchestration
+- **pyRevit & Revit 2027 Bridge**: Connects Antigravity to local Autodesk Revit sessions bypassing vendor licensing crashes.
+- **Parametric Schedule Management**: Automates cost schedules and architectural take-offs directly from `.rvt` models.
+
+### 3. ✦ Custom Antigravity Skills Suite
+- **`computer-use` (Indonesian Edition)**: Customized desktop automation featuring **Cosmic Cyan Ambient Glow** (no harsh white flash), official 4-point Antigravity Star logo, and full Indonesian interface (`Antigravity sedang menggunakan laptop` & `ESC - Berhenti`).
+- **`fast-gui-orchestrator`**: Anti-latency desktop automation engine eliminating intermediate screenshot overhead and keystroke racing.
+- See [`skills/README.md`](./skills/README.md) for 1-click installation by team members and friends.
 - **Revit & PyRevit Automation**: Programmatic dispatch of BIM tasks (e.g., parameter extraction, automated sheet numbering, schedule generation).
 - **Headless Execution**: Interacts with local AEC engines through isolated RPC hooks and computer-use automation.
 - **Dynamo Graph Synthesis**: Converts natural language project requirements into parametric computational definitions.
