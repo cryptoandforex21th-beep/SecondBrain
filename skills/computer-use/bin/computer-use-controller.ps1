@@ -118,6 +118,61 @@ namespace AntigravityComputerUse
         [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
         [DllImport("user32.dll")] public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
         [DllImport("kernel32.dll")] public static extern uint GetCurrentThreadId();
+        [DllImport("user32.dll", SetLastError = true)] public static extern bool SetSystemCursor(IntPtr hcur, uint id);
+        [DllImport("user32.dll", SetLastError = true)] public static extern IntPtr LoadCursorFromFile(string lpFileName);
+        [DllImport("user32.dll", SetLastError = true)] public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, IntPtr pvParam, uint fWinIni);
+
+        public const uint OCR_NORMAL = 32512;
+        public const uint SPI_SETCURSORS = 0x0057;
+
+        private static object cursorLock = new object();
+        public static bool IsCustomCursorActive = false;
+
+        public static void ApplyAntigravityCursor()
+        {
+            lock (cursorLock)
+            {
+                try
+                {
+                    string userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    string[] candidates = new string[] {
+                        Path.Combine(userDir, @".gemini\config\skills\computer-use\resources\antigravity_cursor.cur"),
+                        Path.Combine(userDir, @".gemini\config\skills\computer-use\bin\antigravity_cursor.cur"),
+                        @"d:\SecondBrain\skills\computer-use\resources\antigravity_cursor.cur"
+                    };
+                    string curPath = "";
+                    foreach (string c in candidates)
+                    {
+                        if (File.Exists(c)) { curPath = c; break; }
+                    }
+                    if (!string.IsNullOrEmpty(curPath))
+                    {
+                        IntPtr hCur = LoadCursorFromFile(curPath);
+                        if (hCur != IntPtr.Zero)
+                        {
+                            if (SetSystemCursor(hCur, OCR_NORMAL))
+                            {
+                                IsCustomCursorActive = true;
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
+        public static void RestoreSystemCursor()
+        {
+            lock (cursorLock)
+            {
+                try
+                {
+                    SystemParametersInfo(SPI_SETCURSORS, 0, IntPtr.Zero, 0);
+                    IsCustomCursorActive = false;
+                }
+                catch { }
+            }
+        }
 
         public const uint INPUT_KEYBOARD = 1;
         public const uint KEYEVENTF_KEYUP = 0x0002;
@@ -535,6 +590,7 @@ namespace AntigravityComputerUse
         {
             base.OnHandleCreated(e);
             RegisterHotKey(Handle, HOTKEY_ID, 0, VK_ESCAPE);
+            NativeBridge.ApplyAntigravityCursor();
             try
             {
                 leftGlow = new SideGlowForm(true);
@@ -573,6 +629,7 @@ namespace AntigravityComputerUse
                 if (rightGlow != null) { rightGlow.Close(); rightGlow.Dispose(); rightGlow = null; }
             }
             catch { }
+            NativeBridge.RestoreSystemCursor();
             base.OnFormClosed(e);
         }
 
@@ -691,6 +748,7 @@ namespace AntigravityComputerUse
         {
             isStopped = true;
             try { File.WriteAllText(Path.Combine(stateDir, "stop.flag"), DateTime.UtcNow.ToString("o")); } catch { }
+            NativeBridge.RestoreSystemCursor();
             InvalidateCache();
             if (overlayForm != null) overlayForm.Dismiss();
         }
@@ -797,6 +855,7 @@ namespace AntigravityComputerUse
         public void Stop()
         {
             running = false;
+            NativeBridge.RestoreSystemCursor();
             try { if (idleTimer != null) idleTimer.Stop(); } catch { }
             try { listener.Stop(); } catch { }
             if (overlayForm != null) overlayForm.Dismiss();
@@ -899,6 +958,7 @@ namespace AntigravityComputerUse
                             isStopped = false;
                             try { File.Delete(Path.Combine(stateDir, "stop.flag")); } catch { }
                         }
+                        NativeBridge.ApplyAntigravityCursor();
                         if (!noOverlay && (overlayForm == null || overlayForm.IsDisposed))
                         {
                             try {
@@ -937,6 +997,7 @@ namespace AntigravityComputerUse
                     case "resume":
                         isStopped = false;
                         try { File.Delete(Path.Combine(stateDir, "stop.flag")); } catch { }
+                        NativeBridge.ApplyAntigravityCursor();
                         return new Dictionary<string, object> { { "ok", true }, { "action", action }, { "stopped", false } };
 
                     case "clear-target":
@@ -1800,6 +1861,7 @@ try {
     [AntigravityComputerUse.DesktopRunner]::Run($StateDirectory, $IdleTimeoutMinutes, [bool]$NoOverlay)
 }
 finally {
+    try { [AntigravityComputerUse.NativeBridge]::RestoreSystemCursor() } catch { }
     Remove-Item -LiteralPath $readyFile -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $pidFile -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $portFile -Force -ErrorAction SilentlyContinue
