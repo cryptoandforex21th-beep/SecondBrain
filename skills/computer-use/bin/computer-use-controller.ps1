@@ -167,6 +167,29 @@ namespace AntigravityComputerUse
             {
                 try
                 {
+                    string arrowPath = "";
+                    try
+                    {
+                        using (Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Control Panel\Cursors"))
+                        {
+                            if (key != null)
+                            {
+                                object val = key.GetValue("Arrow");
+                                if (val != null) arrowPath = val.ToString();
+                            }
+                        }
+                    }
+                    catch { }
+
+                    if (!string.IsNullOrEmpty(arrowPath) && File.Exists(arrowPath))
+                    {
+                        IntPtr hCur = LoadCursorFromFile(arrowPath);
+                        if (hCur != IntPtr.Zero) SetSystemCursor(hCur, OCR_NORMAL);
+                    }
+                    else
+                    {
+                        SystemParametersInfo(SPI_SETCURSORS, 0, IntPtr.Zero, 0);
+                    }
                     SystemParametersInfo(SPI_SETCURSORS, 0, IntPtr.Zero, 0);
                     IsCustomCursorActive = false;
                 }
